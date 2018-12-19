@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+        }
+
+        .page {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        #dropzone {
+            height: 75vh;
+            background: rgba(0,0,0,.5);
+        }
+    </style>
+  </head>
+  <body>
+      <div class="page">
+            <div id="dropzone">
+                Drag your file here
+            </div>
+            <form>
+                <div>
+                    <label for="width">Width</label>
+                    <input type="number" id="width" value=1200>
+                </div>
+
+                <div>
+                    <label for="height">Height</label>
+                    <input type="number" id="height" value=300>
+                </div>
+
+                <div>
+                    <label for="exportType">exportType</label>
+                    <input type="text" id="exportType" value='jpg' readonly>
+                </div>
+
+            </form>
+        </div>
+
+        <script>
+            (function () {
+                var holder = document.getElementById('dropzone');
+
+                holder.ondragover = () => {
+                    return false;
+                };
+
+                holder.ondragleave = () => {
+                    return false;
+                };
+
+                holder.ondragend = () => {
+                    return false;
+                };
+
+                holder.ondrop = (e) => {
+                    e.preventDefault();
+
+                    const {ipcRenderer} = require('electron')
+
+                    for (let file of e.dataTransfer.files) {
+                        var payload = {
+                            path: file.path,
+                            width: document.getElementById('width').value,
+                            height: document.getElementById('height').value,
+                            exportType: document.getElementById('exportType').value,
+                        }
+
+                        ipcRenderer.sendSync('process-file', payload)
+                    }
+                    
+                    return false;
+                };
+            })();
+        </script>
+  </body>
+</html>
